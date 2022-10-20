@@ -55,15 +55,15 @@ export const OverlayCSUIContainer = (props: PlasmoCSUIContainerProps) => {
 }
 
 export const InlineCSUIContainer = (props: PlasmoCSUIContainerProps) => (
-  <div
+  <span
     id="plasmo-inline"
     className="plasmo-csui-container"
     style={{
-      display: "flex",
+      display: "inline",
       position: "relative",
       top: 0,
       left: 0
     }}>
     {props.children}
-  </div>
+  </span>
 )

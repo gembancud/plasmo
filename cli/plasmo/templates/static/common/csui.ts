@@ -13,7 +13,7 @@ async function createShadowDOM(Mount: PlasmoCSUI) {
       ? await Mount.createShadowRoot(shadowHost)
       : shadowHost.attachShadow({ mode: "open" })
 
-  const shadowContainer = document.createElement("div")
+  const shadowContainer = document.createElement("span")
 
   shadowContainer.id = "plasmo-shadow-container"
   shadowContainer.style.zIndex = "2147483647"
