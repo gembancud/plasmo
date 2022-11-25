@@ -11,7 +11,7 @@ const [pageRuntime, scriptRuntime, backgroundServiceRuntime] = [
   "script-runtime",
   "background-service-runtime"
 ].map((runtimeName) =>
-  fs.readFileSync(path.join(__dirname, `./${runtimeName}.js`), "utf8")
+  fs.readFileSync(path.join(__dirname, `./runtimes/${runtimeName}.js`), "utf8")
 )
 
 export default new Runtime({
@@ -23,7 +23,7 @@ export default new Runtime({
           dependencies: Record<string, string>
           devDependencies: Record<string, string>
         }>(
-          join(process.env.PLASMO_SRC_DIR, "lab"), // parcel only look up
+          join(process.env.PLASMO_PROJECT_DIR, "lab"), // parcel only look up
           ["package.json"],
           {
             exclude: true

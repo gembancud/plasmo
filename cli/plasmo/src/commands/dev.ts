@@ -1,4 +1,5 @@
-import { aLog, eLog, getFlag, hasFlag, iLog, vLog } from "@plasmo/utils"
+import { getFlag, hasFlag } from "@plasmo/utils/flags"
+import { aLog, eLog, iLog, vLog } from "@plasmo/utils/logging"
 
 import { getBundleConfig } from "~features/extension-devtools/get-bundle-config"
 import { createProjectWatcher } from "~features/extension-devtools/project-watcher"
@@ -63,29 +64,29 @@ async function dev() {
     }
 
     if (event.type === "buildSuccess") {
-      aLog(`✨ Extension re-packaged in ${event.buildTime}ms!`)
+      aLog(`Extension re-packaged in ${chalk.bold(event.buildTime)}ms! 🚀`)
       await plasmoManifest.postBuild()
     } else if (event.type === "buildFailure") {
       event.diagnostics.forEach((diagnostic) => {
         eLog(chalk.redBright(diagnostic.message))
         if (diagnostic.stack) {
-          aLog(diagnostic.stack)
+          vLog(diagnostic.stack)
         }
 
         diagnostic.hints?.forEach((hint) => {
-          aLog(hint)
+          vLog(hint)
         })
 
         diagnostic.codeFrames?.forEach((codeFrame) => {
           if (codeFrame.code) {
-            aLog(codeFrame.code)
+            vLog(codeFrame.code)
           }
           codeFrame.codeHighlights.forEach((codeHighlight) => {
             if (codeHighlight.message) {
-              aLog(codeHighlight.message)
+              vLog(codeHighlight.message)
             }
 
-            aLog(
+            vLog(
               chalk.underline(
                 `${codeFrame.filePath}:${codeHighlight.start.line}:${codeHighlight.start.column}`
               )
@@ -94,6 +95,7 @@ async function dev() {
         })
       })
     }
+    process.env.__PLASMO_FRAMEWORK_INTERNAL_WATCHER_STARTED = "true"
   })
 
   const cleanup = () => {

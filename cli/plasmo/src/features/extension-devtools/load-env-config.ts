@@ -6,9 +6,9 @@ import { existsSync, statSync } from "fs"
 import { readFile } from "fs/promises"
 import { join } from "path"
 
-import { eLog, iLog } from "@plasmo/utils"
+import { eLog, iLog } from "@plasmo/utils/logging"
 
-import { flagMap } from "~features/helpers/flag"
+import { getFlagMap } from "~features/helpers/flag"
 
 export type Env = Record<string, string | undefined>
 export type LoadedEnvFiles = Array<{
@@ -16,12 +16,15 @@ export type LoadedEnvFiles = Array<{
   contents: string
 }>
 
+export const EMBED_ENV_PREFIX = "PLASMO_"
+export const PUBLIC_ENV_PREFIX = "PLASMO_PUBLIC_"
+
 export class PlasmoPublicEnv {
   data: Env
 
   constructor(_env: Env) {
     this.data = Object.keys(_env)
-      .filter((k) => k.startsWith("PLASMO_PUBLIC_"))
+      .filter((k) => k.startsWith(PUBLIC_ENV_PREFIX))
       .reduce(
         (env, key) => {
           env[key] = _env[key]
@@ -58,7 +61,7 @@ function processEnv(loadedEnvFiles: LoadedEnvFiles, dir?: string) {
           if (typeof parsed[key] === "undefined") {
             parsed[key] = resultData[key]
 
-            if (key.startsWith("PLASMO_")) {
+            if (key.startsWith(EMBED_ENV_PREFIX)) {
               process.env[key] = resultData[key]
             }
           }
@@ -73,16 +76,24 @@ function processEnv(loadedEnvFiles: LoadedEnvFiles, dir?: string) {
 }
 
 export async function loadEnvConfig(dir: string) {
-  const mode = process.env.NODE_ENV
+  const nodeEnv = process.env.NODE_ENV
+  const flagMap = getFlagMap()
+
   const dotenvFilePaths = [
+    flagMap.envPath,
+
+    `.env.${flagMap.browser}.local`,
     `.env.${flagMap.tag}.local`,
-    `.env.${mode}.local`,
+    `.env.${nodeEnv}.local`,
+
     // Don't include `.env.local` for `test` environment
     // since normally you expect tests to produce the same
     // results for everyone
-    mode !== "test" ? `.env.local` : "",
+    nodeEnv !== "test" ? `.env.local` : "",
+
+    `.env.${flagMap.browser}`,
     `.env.${flagMap.tag}`,
-    `.env.${mode}`,
+    `.env.${nodeEnv}`,
     ".env"
   ]
     .filter((s) => !!s)

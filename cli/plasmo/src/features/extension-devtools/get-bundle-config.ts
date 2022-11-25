@@ -1,12 +1,10 @@
-import { flagMap } from "~features/helpers/flag"
+import { getFlagMap } from "~features/helpers/flag"
 
 export const getBundleConfig = () => {
-  const target = flagMap.target
-
+  const flagMap = getFlagMap()
+  const { target, tag } = flagMap
   const [browser, manifestVersion] = target.split("-")
-
-  const tag = flagMap.tag
-
+  // Potential runtime config here
   return {
     tag,
     target,
